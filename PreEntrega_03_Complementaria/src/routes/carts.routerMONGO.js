@@ -17,8 +17,10 @@ export const router = Router()
 
 
 router.post('/', async (req, res) => {
+    // let listaProductos = await cartsModelo.findOnd().lean()
 
     let listaProductos = await ProductoCM.getProdCarts()
+    console.log(listaProductos)
 
 
     //Incrementar el id
@@ -27,11 +29,11 @@ router.post('/', async (req, res) => {
         id = listaProductos[listaProductos.length - 1].id + 1
     }
 
+
+
     let products = []
 
-    let nuevoProduct = {
-        id, products
-    }
+    console.log(id + products)
 
 
     try {
@@ -46,18 +48,28 @@ router.post('/', async (req, res) => {
     }
 
 
-   
+
 
 }
 )
 
+router.get('/', async (req, res) => {
+
+
+    let archivoOne = await ProductoCM.getProdCarts()
+
+    res.setHeader('Content-Type', 'application/json');
+    res.status(200).json({ archivoOne });
+
+})
 
 
 router.get('/:cid', async (req, res) => {
 
-    
+
     let id = req.params.cid
-  
+
+
 
 
     let archivoOne
@@ -104,11 +116,11 @@ router.post('/:cid/product/:pid', async (req, res) => {
     // _______________VALIDAR QUE EXISTA EL CARRITO ________________
 
     let archivoCM = await ProductoCM.getProdCarts()
-    
-    let id = req.params.cid
-   
 
-   
+    let id = req.params.cid
+
+
+
 
 
     let archivo
@@ -137,7 +149,7 @@ router.post('/:cid/product/:pid', async (req, res) => {
 
     // _____________________VALIDAR QUE EL PRODUCTO EXISTA _________________
 
-   
+
 
 
     let pid = req.params.pid
@@ -145,16 +157,16 @@ router.post('/:cid/product/:pid', async (req, res) => {
     let archivoPM
     try {
         archivoPM = await productosModelo.findOne({ status: true, _id: pid })
-        console.log( archivoPM)
+        console.log(archivoPM)
     } catch (error) {
         res.setHeader('Content-Type', 'application/json');
         return res.status(500).json({ error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, detalle: error.message })
     }
 
 
- 
 
-   
+
+
 
     // archivoPM = archivoPM.find((prod) => prod.id === pid)
 
@@ -163,12 +175,12 @@ router.post('/:cid/product/:pid', async (req, res) => {
         return res.status(400).json({ error: `El id ${pid} no existe` })
     }
 
- 
 
 
 
 
-      
+
+
 
 
 
@@ -177,31 +189,31 @@ router.post('/:cid/product/:pid', async (req, res) => {
 
 
     // indice del producto _________________________________________________
-   
-    let codigoProd = archivoPM.code
-   
-   
-    let Product = await Producto.getProducts()
-    // Product = JSON.stringify(Product)
-    let indicePCM = Product.findIndex(prod => prod.code === codigoProd)
-    // let indiceProductos = Product.findIndex(prod => prod._id === idParamMongoose)
-    console.log('Este es el indice de los productos :   '+indicePCM)
-    if (indicePCM === -1) {
-        res.setHeader('Content-Type', 'application/json');
-        return res.status(400).json({ error: `No existen usuarios con id ${idParam}` })
-    }
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+
+    // let codigoProd = archivoPM.code
+
+
+    // let Product = await Producto.getProducts()      // Todos los productos 
+    // // Product = JSON.stringify(Product)
+    // let indicePCM = Product.findIndex(prod => prod.code === codigoProd)     // ---> Indice del producto ID
+    // // let indiceProductos = Product.findIndex(prod => prod._id === idParamMongoose)
+    // console.log('Este es el indice de los productos :   '+indicePCM)
+    // if (indicePCM === -1) {
+    //     res.setHeader('Content-Type', 'application/json');
+    //     return res.status(400).json({ error: `No existen usuarios con id ${idParam}` })
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
     // let indicePCM = archivoCM.findIndex(prod => prod._id === id)
 
 
@@ -210,39 +222,111 @@ router.post('/:cid/product/:pid', async (req, res) => {
 
 
 
- //____ ArchivoPM = true -> el producto en producot.json existe
+    //____ ArchivoPM = true -> el producto en producot.json existe
+
+
 
     if (archivoPM) {
-                            // archivo carts, busca el carrito, ahi el porduct y ahi quantity
-        
+
+        // updateRegistroCliente()
 
 
-        let prodFind = archivoCM[indicePCM].products.find((prod) => prod.product === pid)
+        // updateRegistroCliente(clienteID, registroObject) {
+        //     const updatedObject= ClienteModel.findByIdAndUpdate(clienteID,
+        //         { $push: { 'registros': registroObject} },
+        //         { strict: false },
+        //         (err, managerparent) => {
+        //             if (err) {
+        //                 return err.message;
+        //             }
+        //         }
+        //     );
+        //     return updatedObject;
 
-        if (prodFind){
-            if (!prodFind.quantity) {
-                prodFind.quantity = 0
-            }
-            prodFind.quantity = prodFind.quantity + 1
-        } else {
-            let product = archivoPM._id
+
+
+
+
+
+
+
+
+
+
+        // archivo carts, busca el carrito, ahi el porduct y ahi quantity
+
+        archivo = await cartsModelo.findOne({ _id: id})
+        archivo = archivo.products
+        console.log('VER QUE ONDA CON EL PRODUCTS')
+        console.log(archivo)
+        // 
+        // let prodFind = await cartsModelo.findOne({ _id: id }).products
+        let prodFind = await cartsModelo.findOne({_id:id,products:{$elemMatch:{product:pid}}})
+        console.log('comienza el prodfind')
+        console.log(prodFind)
+        console.log('Termina el prodfind')
+
+        let findQuantity
+        //___________ Si PRODUCTS no tiene PRODUCT __________
+        if (prodFind == undefined) { // --> Si no tiene product SE CREA
+            console.log('PASO ALGO EN EL UNDEFINED ')
+            let product = pid
             let quantity = 1
-            archivoCM[indicePCM].products.create({ product, quantity })
+            let CreateProduct = await cartsModelo.updateOne({ _id: id }, { $push: { products: { product, quantity } } })
+            
+       
 
+            console.log(CreateProduct)
+
+        } else {
+
+            findQuantity = await cartsModelo.findOne({ _id: id })
+            findQuantity =  findQuantity.products.find((prod) => prod.product === pid)
+            findQuantity = findQuantity.quantity
+           
+            findQuantity = findQuantity + 1 
+
+
+            let Romita = await cartsModelo.updateOne(
+                { 
+                     _id: id 
+                },
+                {
+                    "$set":{
+                        "products.$[elemX].quantity":findQuantity
+                    }
+                },
+                { 
+                    "arrayFilters":[{"elemX.product":pid}]
+                } )
+
+            
+
+        
+          
+        }
+
+
+        let CarritoActualizado
+
+        if (prodFind == null) {
+            CarritoActualizado = `Se Creo los campos product y quantity. Product = ${pid} y Quantity = ${findQuantity}`
+        } else {
+            CarritoActualizado = await cartsModelo.findOne({ _id: id })
         }
 
 
 
-        let ProductAdd =  archivoCM[indicePCM]
-         
+
+
 
         res.setHeader('Content-Type', 'application/json');
-        return res.status(201).json({ archivoCM, ProductAdd });
+        return res.status(201).json({ CarritoActualizado});
         // return res.status(201).json({ archivoPM, product, archivoCM });
-        
 
 
-        
+
+
 
 
     }

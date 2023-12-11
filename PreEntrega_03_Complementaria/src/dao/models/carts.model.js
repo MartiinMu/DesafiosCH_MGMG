@@ -6,10 +6,12 @@ const cartsColeccion = 'carts'
 const cartsEsquema = new mongoose.Schema(
     {
 
-        id: Number,
+        id:{
+            type: Number,
+        },
         products: [
             {
-                product: Number,
+                product: String,
                 quantity: Number,
             }]
 

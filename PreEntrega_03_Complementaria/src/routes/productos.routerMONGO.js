@@ -132,6 +132,7 @@ router.post('/', async (req, res) => {
 
 
   
+    io.emit("newProduct", { id, ...req.body })
 
 
 
@@ -146,7 +147,6 @@ router.post('/', async (req, res) => {
     }
 
 
-    io.emit("newProduct", { id, ...req.body })
 
 
 

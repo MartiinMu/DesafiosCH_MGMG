@@ -46,9 +46,7 @@ export const io=new Server(server)
 
 
 
-io.on("connection", socket => {    
-    console.log(`cliente conectado`)
-})
+
 
 
 try {
@@ -65,7 +63,29 @@ try {
 
 
 
+io.on("connection",socket =>{  
+    console.log(`Se ha conectado un cliente con id ${socket.id}`)
 
+    socket.on('id',nombre=>{
+
+        usuarios.push({nombre, id:socket.id})
+        socket.broadcast.emit('nuevoUsuario',nombre)
+        socket.emit("hello",mensajes)
+    })
+
+    socket.on('mensaje', datos=>{
+        mensajes.push(datos)
+        io.emit('nuevoMensaje', datos)
+    })
+
+    socket.on("disconnect",()=>{
+        let usuario=usuarios.find(u=>u.id===socket.id)
+        if(usuario){
+            io.emit("usuarioDesconectado", usuario.nombre)
+        }
+    })
+
+})
 
 
 
