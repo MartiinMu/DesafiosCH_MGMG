@@ -4,6 +4,8 @@ import express from 'express';
 import {engine} from 'express-handlebars';
 import {Server} from 'socket.io'
 import mongoose from 'mongoose'
+import { messagesModelo } from './dao/models/message.model.js';
+
 
 
 
@@ -12,7 +14,8 @@ import mongoose from 'mongoose'
 import {router as routerProductos} from './routes/productos.routerMONGO.js'
 import {router as routerCarts} from './routes/carts.routerMONGO.js'
 import { router as routerRealTimeProducts } from './routes/realTimeProducts.router.js';
-
+import { router as routerMessages } from './routes/messages.router.js';
+import { stringify } from 'querystring';
 
 
 
@@ -32,6 +35,8 @@ app.use(express.urlencoded({extended:true}));
 app.use('/', routerRealTimeProducts)
 app.use('/api/products', routerProductos)
 app.use('/api/carts', routerCarts)
+app.use('/chat', routerMessages)
+
 
 app.use(express.static(path.join(__dirname,'/public')));
 
@@ -58,6 +63,12 @@ try {
 }
 
 
+let usuarios=[]
+let mensajes=[]
+
+
+
+
 
 
 
@@ -66,9 +77,10 @@ try {
 io.on("connection",socket =>{  
     console.log(`Se ha conectado un cliente con id ${socket.id}`)
 
+    
     socket.on('id',nombre=>{
 
-        usuarios.push({nombre, id:socket.id})
+        usuarios.push({nombre, id:socket.id})   
         socket.broadcast.emit('nuevoUsuario',nombre)
         socket.emit("hello",mensajes)
     })
@@ -76,6 +88,16 @@ io.on("connection",socket =>{
     socket.on('mensaje', datos=>{
         mensajes.push(datos)
         io.emit('nuevoMensaje', datos)
+
+
+  
+    messagesModelo.create({user:datos.emisor,message:datos.mensaje})
+        
+
+       
+
+
+       
     })
 
     socket.on("disconnect",()=>{
@@ -89,5 +111,5 @@ io.on("connection",socket =>{
 
 
 
-
+console.log("El utlima CONSOLE LOG " + mensajes)
 

@@ -1,51 +1,74 @@
 console.log("Chat conectado")
 
-const socket=io()
 
-let divMensaje=document.getElementById('mensaje')
-let inputNombre=document.getElementById('nombre')
-let inputEmail=document.getElementById('email')
-let btnSubmit=document.getElementById('btnSubmit')
+const socket = io()
 
 
+let inputMensaje=document.getElementById('mensaje')
+let divMensajes=document.getElementById('mensajes')
+
+Swal.fire({
+    title:"Identifiquese",
+    input:"text",
+    text:"Ingrese su nickname",
+    inputValidator: (value)=>{
+        return !value && "Debe ingresar un nombre...!!!"
+    },
+    allowOutsideClick:false
+}).then(resultado=>{
+    console.log(resultado)
+    socket.emit('id', resultado.value) 
+    inputMensaje.focus()
+    document.title=resultado.value
 
 
 
 
 
 
+    socket.on('nuevoUsuario',nombre=>{
+        // TODO: popup con el aviso
+        Swal.fire({
+            text:`${nombre} se ha conectado...!!!`,
+            toast:true,
+            position:"top-right"
+        })
+    })
 
+    socket.on("hello",mensajes=>{
+        mensajes.forEach(mensaje=>{
+            let parrafo=document.createElement('p')
+            parrafo.innerHTML=`<strong>${mensaje.emisor}</strong> dice: <i>${mensaje.mensaje}</i>`
+            parrafo.classList.add('mensaje')
+            let br=document.createElement('br')
+            divMensajes.append(parrafo, br)
+            divMensajes.scrollTop=divMensajes.scrollHeight   
+        })
+    })
 
+    socket.on("usuarioDesconectado",nombre=>{
+        Swal.fire({
+            text:`${nombre} se ha desconectado...!!!`,
+            toast:true,
+            position:"top-right"
+        })
+    })
 
-// socket.on("newProduct",Prod=>{
-//     console.log("Producto agregado:",Prod)
-    
-  
-//    let nuevoProductoTexto = 
-   
-//    `<strong>Id:</strong> ${Prod.id} <br>
-//    <strong>Title:</strong> ${Prod.title} <br>
-//    <strong>Description:</strong> ${Prod.description}<br>
-//    <strong>Code:</strong> ${Prod.code}<br>
-//    <strong>Price: </strong> ${Prod.price}<br>
-//    <strong>Status: </strong>${Prod.status}<br>
-//    <strong>Stock: </strong> ${Prod.stock}<br>
-//    <strong>Category: </strong>${Prod.category}<br>
-//    <strong>Thumbnails: </strong> ${Prod.thumbnails}<br>`
-   
+    socket.on('nuevoMensaje', datos=>{
+        let parrafo=document.createElement('p')
+        parrafo.innerHTML=`<strong>${datos.emisor}</strong> dice: <i>${datos.mensaje}</i>`
+        parrafo.classList.add('mensaje')
+        let br=document.createElement('br')
+        divMensajes.append(parrafo, br)
+        divMensajes.scrollTop=divMensajes.scrollHeight
+    })
 
-//     let ulProd=document.querySelector('ul')
-//     let liNuevoProducto=document.createElement('li')
-//     liNuevoProducto.innerHTML=nuevoProductoTexto
-//     ulProd.append(liNuevoProducto)
-// })
+    inputMensaje.addEventListener("keyup",(e)=>{
+        // console.log(e, e.target.value)
+        if(e.code==="Enter" && e.target.value.trim().length>0){
+            socket.emit('mensaje',{emisor:resultado.value, mensaje:e.target.value.trim()})
+            e.target.value=''
+        }
+    })
 
-
-// socket.on("removeProduct",Prod=>{
-//     console.log("El producto eliminado es el de la posicion:",Prod)
-//     let id=parseInt(Prod)
-//     let removProd = document.querySelectorAll('li')[id]
-//     removProd.remove();
-
-// })
-
+})
