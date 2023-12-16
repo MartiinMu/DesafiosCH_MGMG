@@ -74,7 +74,7 @@ router.get('/:cid', async (req, res) => {
 
     let archivoOne
     try {
-        archivoOne = await cartsModelo.findOne({ _id: id })
+        archivoOne = await cartsModelo.findOne({ _id: id }).populate('products.product'),
         console.log(archivoOne)
     } catch (error) {
         res.setHeader('Content-Type', 'application/json');
@@ -96,13 +96,50 @@ router.get('/:cid', async (req, res) => {
     res.status(200).json({ archivoOne });
 
 
+// :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 
 
 
 
 
 
+
+let selectCart = cartsModelo.findOne({ _id: id }).projection({_id:0,id:0,createdAt:0,updatedAt:0})
+        console.log('comienza el prodfind')
+        console.log(selectCart)
+        console.log('Termina el prodfind')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    const esSolicitudJSON = req.headers['content-type'] === 'application/json';
+      
+ if (esSolicitudJSON) {
+    res.status(200).json({ archivoOne });
+  } else {
+
+    res.status(201).render('cartId', { titulo: 'Producto cId', selectCart })
+  }
+      
+      
 })
+
+
+
 
 
 

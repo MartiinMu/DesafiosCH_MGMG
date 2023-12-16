@@ -15,7 +15,8 @@ import {router as routerProductos} from './routes/productos.routerMONGO.js'
 import {router as routerCarts} from './routes/carts.routerMONGO.js'
 import { router as routerRealTimeProducts } from './routes/realTimeProducts.router.js';
 import { router as routerMessages } from './routes/messages.router.js';
-import { stringify } from 'querystring';
+
+
 
 
 
@@ -36,6 +37,7 @@ app.use('/', routerRealTimeProducts)
 app.use('/api/products', routerProductos)
 app.use('/api/carts', routerCarts)
 app.use('/chat', routerMessages)
+
 
 
 app.use(express.static(path.join(__dirname,'/public')));

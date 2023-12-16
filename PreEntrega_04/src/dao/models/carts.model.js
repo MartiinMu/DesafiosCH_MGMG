@@ -12,7 +12,10 @@ const cartsEsquema = new mongoose.Schema(
         },
         products: [
             {
-                product: String,
+                product: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: 'products'
+                },
                 quantity: Number,
             }]
 
@@ -26,5 +29,21 @@ const cartsEsquema = new mongoose.Schema(
 )
 
 cartsEsquema.plugin(paginate)
+
+
+// cartsEsquema.pre("findOne", function(){
+//     this.populate({
+//         path: 'products.product',
+//     }).lean()
+// })
+
+
+// cartsEsquema.pre("find", function(){
+//     this.populate({
+//         path: 'products.product',
+//     }).lean()
+// })
+
+
 
 export const cartsModelo = mongoose.model(cartsColeccion, cartsEsquema)

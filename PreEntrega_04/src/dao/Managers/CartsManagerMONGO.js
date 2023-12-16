@@ -8,7 +8,7 @@ export default class CartsManager{
 
      async getProdCarts(){
         try {
-            return await cartsModelo.find().lean()
+            return await cartsModelo.find()
          } catch (error) {
              console.log(error)
              return null
