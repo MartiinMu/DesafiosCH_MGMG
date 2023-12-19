@@ -292,7 +292,7 @@ router.get('/products', async (req, res) => {
 
 
 
-
+    let usuarioCookie = req.session.usuario
 
 
     let { limit, page, category, precio } = req.query;
@@ -460,7 +460,7 @@ router.get('/products', async (req, res) => {
         })
     } else {
 
-        res.status(201).render('products', { titulo: 'Products', products: products.docs, prevlink, nextLink, totalPages, hasNextPage, hasPrevPage, prevPage, nextPage, estilo: "Button" })
+        res.status(201).render('products', { titulo: 'Products', products: products.docs, prevlink, nextLink, totalPages, hasNextPage, hasPrevPage, prevPage, nextPage,usuarioCookie, estilo: "Button" })
     }
 
 
@@ -524,3 +524,56 @@ router.get('/products/:pid', async (req, res) => {
 
 
 
+
+
+
+
+// _______ LOGIN__________________________________________________
+
+
+
+
+const auth=(req, res, next)=>{
+    if(!req.session.usuario){
+        res.redirect('/login')
+    }
+
+    next()
+}
+
+
+
+
+
+router.get('/registro',(req,res)=>{
+
+    let {error}=req.query
+
+    res.setHeader('Content-Type','text/html')
+    res.status(200).render('registro', {error})
+})
+
+
+
+
+router.get('/login',(req,res)=>{
+
+    let {error, mensaje}=req.query
+
+    res.setHeader('Content-Type','text/html')
+    res.status(200).render('login', {error, mensaje})
+})
+
+
+
+
+router.get('/perfil', auth, (req,res)=>{
+
+    let usuario=req.session.usuario
+
+    let rol = req.session.usuario.nombre
+    console.log(rol)
+
+    res.setHeader('Content-Type','text/html')
+    res.status(200).render('perfil', {usuario})
+})

@@ -1,8 +1,22 @@
 
 <h2>Productos</h2>
+
+
+
+
+<p> Bienvendio Nombre: {{this.nombre}} -  Correo Electrónico: <strong>{{this.email}}</strong></p>
+<div class="botonContainerPerfil">
+  <a href="/perfil" class="linkPerfil">Ir a Perfil</a>
+
+  <span class="plusPerfil">+</span>
+</div>
+
+
+
+
 <hr>
 <ul>
-    {{#each selectCart}}
+    {{#each products}}
     <li>
 
         <strong>Id:</strong> {{this.id}} <br>
@@ -14,7 +28,29 @@
         <strong>Stock: </strong> {{this.stock}}<br>
         <strong>Category: </strong>{{this.category}}<br>
         <strong>Thumbnails: </strong> {{this.thumbnails}}<br>
-       
+    
+
+<div class="botonContainer">
+  <a href="/products/{{this.id}}" class="productSelect">Boton</a>
+
+  <span class="plus">+</span>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <br><br>
 
@@ -29,7 +65,7 @@
 
 
 
-
+<a href="/products?page=1">Pág.1</a>
 
 {{#if hasPrevPage}}
     <a href="/products?page={{prevPage}}">Pág.Ant.</a>
@@ -52,3 +88,6 @@
 
 
 <a href="/">Home</a>
+
+<script src="socket.io/socket.io.js"></script>
+<script src="js/Client.js"></script>
