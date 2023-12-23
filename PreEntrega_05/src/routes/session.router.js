@@ -8,29 +8,34 @@ export const router = Router()
 router.post('/login', async(req, res)=>{
 
     let {email, password}=req.body
+
+ 
+
+
     if(!email || !password){
-        return res.redirect('/login?error=Complete todos los datos')
+      
+        return res.redirect('/?error=Complete todos los datos')
+      
     }
 
+    
 
-
-
+    
 
     if (email=="adminCoder@coder.com" && password== "adminCod3r123"){
       
-        password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex")
+        password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex") // encriptar clave
 
-        let usuario=await usuariosModelo.findOne({email, password})
-        if(!usuario){
-            return res.redirect(`/login?error=credenciales incorrectas`)
+        let usuario = {
+            nombre:"admin", email: email, rol:"admin"
         }
-      
+             
       
         req.session.usuario={
-            nombre:usuario.nombre, email:usuario.email, rol:"admin"
+            nombre:"admin", email: email, rol:"admin"
             
         }
-        console.log('PASO POR ADMIN :::::::::::::::::::::::::::::::::::')
+      
 
 
     } else {
@@ -39,7 +44,8 @@ router.post('/login', async(req, res)=>{
 
         let usuario=await usuariosModelo.findOne({email, password})
         if(!usuario){
-            return res.redirect(`/login?error=credenciales incorrectas`)
+        
+            return res.redirect(`/?error=credenciales incorrectas`)
         }
 
 
@@ -47,7 +53,7 @@ router.post('/login', async(req, res)=>{
         req.session.usuario={
             nombre:usuario.nombre, email:usuario.email, rol:'usuario'
         }
-        console.log('PASO POR USUARIO :::::::::::::::::::::::::::::::::::')
+        
     }
 
 
@@ -92,18 +98,13 @@ router.post('/registro',async(req,res)=>{
     
     
     
-    if (email=="adminCoder@coder.com" && password=="adminCod3r123"){
+    if (email=="adminCoder@coder.com"){
         
-        let usuario
-        let rol = "admin"
-        try {
-            password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex")
-            usuario=await usuariosModelo.create({nombre, email, password, rol})
-            res.redirect(`/login?mensaje=Usuario ${email} registrado correctamente`)
-            
-        } catch (error) {
-            res.redirect('/registro?error=Error inesperado. Reintente en unos minutos')
-        }
+
+
+        return res.redirect(`/registro?error=Ingrese otro email - email invalido`)
+
+        
 
     } else {
        let usuario
@@ -111,7 +112,7 @@ router.post('/registro',async(req,res)=>{
         try {
             password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex")
             usuario=await usuariosModelo.create({nombre, email, password, rol})
-            res.redirect(`/login?mensaje=Usuario ${email} registrado correctamente`)
+            res.redirect(`/?mensaje=Usuario ${email} registrado correctamente`)
             
         } catch (error) {
             res.redirect('/registro?error=Error inesperado. Reintente en unos minutos')
@@ -134,10 +135,10 @@ router.get('/logout',(req,res)=>{
     
     req.session.destroy(error=>{
         if(error){
-            res.redirect('/login?error=fallo en el logout')
+            res.redirect('/?error=fallo en el logout')
         }
     })
 
-    res.redirect('/login')
+    res.redirect('/')
 
 });

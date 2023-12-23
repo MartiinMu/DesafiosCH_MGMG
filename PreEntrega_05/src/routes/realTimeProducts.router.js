@@ -15,7 +15,7 @@ const productoManager = new ProductManager()
 
 
 
-router.get('/', (req, res) => {
+router.get('/home', (req, res) => {
 
 
     res.status(200).render('home', { titulo: 'Home' })
@@ -293,6 +293,7 @@ router.get('/products', async (req, res) => {
 
 
     let usuarioCookie = req.session.usuario
+    console.log('USUARIO COKKIER :::::' + usuarioCookie.nombre)
 
 
     let { limit, page, category, precio } = req.query;
@@ -457,6 +458,7 @@ router.get('/products', async (req, res) => {
             hasNextPage,
             prevlink,
             nextLink,
+            
         })
     } else {
 
@@ -535,7 +537,7 @@ router.get('/products/:pid', async (req, res) => {
 
 const auth=(req, res, next)=>{
     if(!req.session.usuario){
-        res.redirect('/login')
+        res.redirect('/')
     }
 
     next()
@@ -556,7 +558,7 @@ router.get('/registro',(req,res)=>{
 
 
 
-router.get('/login',(req,res)=>{
+router.get('/',(req,res)=>{
 
     let {error, mensaje}=req.query
 
