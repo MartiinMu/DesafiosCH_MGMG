@@ -106,14 +106,14 @@ export const inicializarPassport = () => {
                     // password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex") // encriptar clave
                     password = creaHash(password)
                     usuario = {
-                        nombre:"admin", email: username, rol:"admin"
+                        nombre:"admin", email: username, rol:"admin", _id: "admin"
                     }
                          
                   
-                    req.session.usuario={
-                        nombre:"admin", email: username, rol:"admin"
+                    // req.session.usuario={
+                    //     nombre:"admin", email: username, rol:"admin"
                         
-                    }
+                    // }
                   
             
             
@@ -158,8 +158,17 @@ export const inicializarPassport = () => {
         })
     
         passport.deserializeUser(async(id, done)=>{
-            let usuario=await usuariosModelo.findById(id) // ---> Aca toma el valor guardado del serializador, que es el id,  y los busca en el modelo
-            return done(null, usuario)
+            let usuario
+            if (id == "admin"){
+                usuario = {
+                    nombre:"admin", email: "adminCoder@coder.com", rol:"admin"
+                }
+                return done(null, usuario)
+            } else {
+
+                usuario=await usuariosModelo.findById(id) // ---> Aca toma el valor guardado del serializador, que es el id,  y los busca en el modelo
+                return done(null, usuario)
+            }
         })
 
 
