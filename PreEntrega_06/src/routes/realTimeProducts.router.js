@@ -293,7 +293,7 @@ router.get('/products', async (req, res) => {
 
 
     let usuarioCookie = req.session.usuario
-    console.log('USUARIO COKKIER :::::' + usuarioCookie.nombre)
+    console.log('USUARIO COKKIER :::::' + usuarioCookie)
 
 
     let { limit, page, category, precio } = req.query;

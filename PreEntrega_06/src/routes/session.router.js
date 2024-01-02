@@ -3,6 +3,7 @@ import { usuariosModelo} from '../dao/models/usuarios.modelo.js'
 // import crypto from 'crypto'
 import { creaHash,validaPassword } from '../utils.js'
 export const router = Router()
+import passport from 'passport'
 
 
 
@@ -79,7 +80,7 @@ router.post('/login',passport.authenticate('login',{failureRedirect:'/api/sessio
     
 
     req.session.usuario={
-                nombre:usuario.nombre, email:usuario.email, rol:'usuario'
+                nombre:req.user.nombre, email:req.user.email, rol:req.user.rol
             }
             
 

@@ -1,7 +1,7 @@
 import passport from "passport";
 import local from 'passport-local'
 import { usuariosModelo } from "../dao/models/usuarios.modelo.js";
-import { creaHash } from "../utils.js";
+import { creaHash, validaPassword } from "../utils.js";
 
 
 
@@ -92,16 +92,20 @@ export const inicializarPassport = () => {
 
             try{
 
+
+
                 if(!username || !password){
                   
                     return done(null, false)
                 }
+
+                let usuario
             
-                if (email=="adminCoder@coder.com" && password== "adminCod3r123"){
+                if (username=="adminCoder@coder.com" && password== "adminCod3r123"){
                   
                     // password=crypto.createHmac("sha256", "codercoder123").update(password).digest("hex") // encriptar clave
                     password = creaHash(password)
-                    let usuario = {
+                    usuario = {
                         nombre:"admin", email: username, rol:"admin"
                     }
                          
@@ -115,7 +119,7 @@ export const inicializarPassport = () => {
             
                 } else {
  
-                   let usuario=await usuariosModelo.findOne({email:username}).lean()
+                    usuario=await usuariosModelo.findOne({email:username}).lean()
             
                     if(!usuario){
                         return done(null, usuario)
