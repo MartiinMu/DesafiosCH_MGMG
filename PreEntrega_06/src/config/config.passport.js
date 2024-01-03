@@ -2,6 +2,7 @@ import passport from "passport";
 import local from 'passport-local'
 import { usuariosModelo } from "../dao/models/usuarios.modelo.js";
 import { creaHash, validaPassword } from "../utils.js";
+import github from 'passport-github2'
 
 
 
@@ -151,10 +152,49 @@ export const inicializarPassport = () => {
 
 
 
+    passport.use('github', new github.Strategy(
+        {
+            clientID: "Iv1.0b70111622068c74", 
+            clientSecret: "1e51db436d284959214693844eac70a8ae5c6f7a", 
+            callbackURL: "http://localhost:8080/api/sessions/callbackGithub", 
+
+        },
+        async (accesToken, refreshToken, profile,done)=>{
+            try{
+
+                console.log(profile)
+
+                let usuario=await usuariosModelo.findOne({email: profile._json.email})
+
+                if(!usuario){
+                    let nuevoUsuario={
+                        nombre: profile._json.name,
+                        email: profile._json.email, 
+                        rol:"usuario",
+                        profile
+                    }
+
+                    usuario=await usuariosModelo.create(nuevoUsuario)
+                }
+                return done(null, usuario)
+                
+
+
+            } catch(error){
+                return done(error)
+            }
+        }
+    ))
+
+
+
+
+
+
 
         // configurar serializador y deserializador
         passport.serializeUser((usuario, done)=>{
-            return done(null, usuario._id) //---> Se guarda en session el _id. Osea que la session en el seralizaeUser va a tener guardado el id
+            return done(null, usuario._id) 
         })
     
         passport.deserializeUser(async(id, done)=>{
@@ -166,7 +206,7 @@ export const inicializarPassport = () => {
                 return done(null, usuario)
             } else {
 
-                usuario=await usuariosModelo.findById(id) // ---> Aca toma el valor guardado del serializador, que es el id,  y los busca en el modelo
+                usuario=await usuariosModelo.findById(id) 
                 return done(null, usuario)
             }
         })
