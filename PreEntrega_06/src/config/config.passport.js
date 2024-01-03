@@ -164,6 +164,11 @@ export const inicializarPassport = () => {
 
                 console.log(profile)
 
+                if (profile._json.email == null){
+                    console.log("Configurar Github con un email publico")
+                    return done(null, false)
+                }
+
                 let usuario=await usuariosModelo.findOne({email: profile._json.email})
 
                 if(!usuario){

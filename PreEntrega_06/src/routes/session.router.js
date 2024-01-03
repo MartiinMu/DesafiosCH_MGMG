@@ -12,7 +12,7 @@ import passport from 'passport'
 
 
 router.get('/errorLogin',(req,res)=>{
-    return res.redirect('/registro?error=Error en el proceso de registro')
+    return res.redirect('/?error=Error en el proceso de registro')
 })
 
 
@@ -182,7 +182,7 @@ router.get('/logout',(req,res)=>{
 
 router.get('/github',passport.authenticate('github',{}), (req,res)=>{})
 
-router.get('/callbackGithub', passport.authenticate('github',{failureRedirect:"/api/session/errorGithub"}),(req,res)=>{
+router.get('/callbackGithub', passport.authenticate('github',{failureRedirect:"/api/sessions/errorGithub"}),(req,res)=>{
 
     console.log(req.user)
     req.session.usuario=req.user
@@ -194,10 +194,7 @@ router.get('/callbackGithub', passport.authenticate('github',{failureRedirect:"/
 
 router.get('/errorGithub',(req,res)=>{
 
-    res.setHeader('Content-type', 'application/json');
-    res.status(200).json({
-        error:"Error al autenticar con Github"
-    });
+    return res.redirect('/?error=Configurar Github con un email publico')
 
     
 
