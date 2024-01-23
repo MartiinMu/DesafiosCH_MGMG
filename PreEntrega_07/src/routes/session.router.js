@@ -17,15 +17,21 @@ router.get('/errorLogin', (req, res) => {
 
 router.post('/login', passport.authenticate('login', { failureRedirect: '/api/sessions/errorLogin' }), async (req, res) => {
 
-
-    req.session.usuario = {
-        nombre: req.user.nombre, email: req.user.email, rol: req.user.rol
+      req.session.usuario = {
+        nombre: req.user.first_name,
+        apellido:req.user.last_name,
+        email: req.user.email,
+        edad: req.user.age,
+        carrito: req.user.cart,
+        rol: req.user.rol
     }
 
     let token=generaToken(req.user)
+    
     res.cookie("coderCookie", token, {httpOnly:true, maxAge: 1000*60*60})
 
-    
+ 
+
 
     res.redirect('/products')
 
@@ -56,7 +62,6 @@ router.post('/registro', passport.authenticate('registro', { failureRedirect: '/
 
 
 
-
 router.get('/logout', (req, res) => {
 
     req.session.destroy(error => {
@@ -64,6 +69,8 @@ router.get('/logout', (req, res) => {
             res.redirect('/?error=fallo en el logout')
         }
     })
+
+    res.clearCookie('coderCookie')
 
     res.redirect('/')
 
@@ -90,3 +97,23 @@ router.get('/errorGithub', (req, res) => {
 
 
 });
+
+
+
+
+
+
+
+router.get('/errorCurrent', (req, res) => {
+    return res.redirect('/?error=Error inesperado')
+})
+
+
+router.get('/current', passport.authenticate('current', {session:false,  failureRedirect: '/api/sessions/errorCurrent' }), (req,res)=>{
+
+    let usuario=req.session.usuario
+  
+    
+    res.setHeader('Content-Type','text/html')
+    res.status(200).render('current', {usuario})
+})

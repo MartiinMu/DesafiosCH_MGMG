@@ -7,13 +7,15 @@ import passportJWT from 'passport-jwt'
 
 
 
-const buscarToken=(req)=>{
+
+const buscaToken=(req)=>{
     let token=null
 
     if(req.cookies.coderCookie){
         token=req.cookies.coderCookie
         
     }
+   
     return token
 }
 
@@ -24,18 +26,18 @@ const buscarToken=(req)=>{
 
 
 
-
-
-
 export const inicializarPassport = () => {
 
-    passport.use("jwt", new passportJWT.Strategy(
+
+    passport.use("current", new passportJWT.Strategy(
         {
             secretOrKey: SECRET,                        //---> CLAVE
-            jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([buscarToken]) //---> EL TOKEN
+            jwtFromRequest: passportJWT.ExtractJwt.fromExtractors([buscaToken])
+          
         },
         async (contenidoToken ,done)=>{
             try {
+              
                 return done(null, contenidoToken)
             } catch (error) {
                 return done(error)
@@ -58,7 +60,7 @@ export const inicializarPassport = () => {
             try {
                 
                 let { first_name, last_name, age, email} = req.body
-                console.log(first_name, last_name, age, email)
+                
                 if (!first_name || !last_name || !age || !email || !password) {
                     return done(null, false)
                 }
@@ -92,7 +94,7 @@ export const inicializarPassport = () => {
                     try {
                         password = creaHash(password)
                         usuario = await usuariosModelo.create({  first_name, last_name, age, email, password, rol })
-                        console.log(usuario)
+                        
                         return done(null, usuario) 
                     } catch (error) {
                         return done(null, false)

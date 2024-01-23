@@ -42,6 +42,9 @@ export const passportCall=(estrategia)=>{
 export const generaToken=(usuario)=>jwt.sign({...usuario}, SECRET, {expiresIn: "1h"})
 
 
+
+
+
 export const auth = (req, res, next) => {
 
   if (!req.cookies.coderCookie) {
@@ -50,10 +53,10 @@ export const auth = (req, res, next) => {
   }
 
   let token = req.cookies.coderCookie
-  console.log(token)
+  
 
   try {
-      let usuario = jwt.verify(token, SECRETKEY)
+      let usuario = jwt.verify(token, SECRET)
       req.user = usuario
       next()
   } catch (error) {

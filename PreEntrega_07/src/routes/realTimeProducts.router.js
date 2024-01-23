@@ -4,6 +4,7 @@ export const router = Router()
 import ProductManager from '../dao/Managers/ProductManagerMONGO.js';
 import { Producto } from './productos.routerMONGO.js';
 import { productosModelo } from '../dao/models/products.model.js';
+import passport from 'passport';
 
 
 const productoManager = new ProductManager()
@@ -99,7 +100,7 @@ router.get('/realtimeproducts', async (req, res) => {
     //__________________FILTRO - SORT_____________________________________
 
     if (precio == 'asc') {
-        console.log('Esto es el category: ****||||||||||||||||||||||******** ' + precio)
+        
         precio = 1
         options.sort = { precio: precio }
     } else if (precio == 'desc') {
@@ -199,8 +200,8 @@ router.get('/carts/:cid', async (req, res) => {
 
     let archivoOne
     try {
-        archivoOne = await cartsModelo.findOne({ _id: id }).populate('products.product'),
-            console.log(archivoOne)
+        archivoOne = await cartsModelo.findOne({ _id: id }).populate('products.product')
+            
     } catch (error) {
         res.setHeader('Content-Type', 'application/json');
         return res.status(500).json({ error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, detalle: error.message })
@@ -445,29 +446,6 @@ router.get('/products/:pid', async (req, res) => {
 })
 
 
-
-
-
-
-
-
-// _______ LOGIN__________________________________________________
-
-
-
-
-const auth=(req, res, next)=>{
-    if(!req.session.usuario){
-        res.redirect('/')
-    }
-
-    next()
-}
-
-
-
-
-
 router.get('/registro',(req,res)=>{
 
     let {error}=req.query
@@ -490,12 +468,3 @@ router.get('/',(req,res)=>{
 
 
 
-router.get('/perfil', auth, (req,res)=>{
-
-    let usuario=req.session.usuario
-
-    let rol = req.session.usuario.nombre
-    
-    res.setHeader('Content-Type','text/html')
-    res.status(200).render('perfil', {usuario})
-})
