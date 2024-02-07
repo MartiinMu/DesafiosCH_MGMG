@@ -10,7 +10,7 @@ socket.on("newProduct",Prod=>{
   
    let nuevoProductoTexto = 
    
-   `<strong>Id:</strong> ${Prod.id} <br>
+   `<strong>Id:</strong> ${Prod._id} <br>
    <strong>Title:</strong> ${Prod.title} <br>
    <strong>Description:</strong> ${Prod.description}<br>
    <strong>Code:</strong> ${Prod.code}<br>
