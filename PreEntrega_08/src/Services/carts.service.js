@@ -18,6 +18,10 @@ async getOneCartPopulate(filter,populate){
     return await this.dao.getOneWithPopulate(filter, populate)
 }
 
+async getByIdProjection(filter,projection){
+    return await this.dao.getByIdWithProjection(filter, projection)
+}
+
 async creatCart(cart){
     return await this.dao.create(cart)
 }

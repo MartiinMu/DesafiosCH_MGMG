@@ -257,7 +257,4 @@ export class ProductsController {
 
 
 
-
-
-
 }

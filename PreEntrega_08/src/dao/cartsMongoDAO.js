@@ -15,6 +15,10 @@ export class cartDAO{
         return cartsModelo.paginate()
     }
 
+    async getByIdWithProjection(filter,projection){
+        return cartsModelo.findOne(filter).projection(projection)
+    }
+
     
     async create (cart) {
         return await cartsModelo.create(cart)

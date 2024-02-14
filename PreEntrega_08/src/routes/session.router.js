@@ -1,9 +1,8 @@
 import { Router } from 'express'
-import { usuariosModelo } from '../dao/models/user.modelo.js'
-import { creaHash, validaPassword,generaToken } from '../utils.js'
+import { generaToken } from '../utils.js'
 export const router = Router()
 import passport from 'passport'
-
+import { UsuariosReadDTO } from '../DTO/userDTO.js'
 
 
 
@@ -112,7 +111,7 @@ router.get('/errorCurrent', (req, res) => {
 router.get('/current', passport.authenticate('current', {session:false,  failureRedirect: '/api/sessions/errorCurrent' }), (req,res)=>{
 
     let usuario=req.session.usuario
-  
+    usuario = new UsuariosReadDTO(usuario)
     
     res.setHeader('Content-Type','text/html')
     res.status(200).render('current', {usuario})

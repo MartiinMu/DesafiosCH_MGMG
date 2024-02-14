@@ -28,8 +28,8 @@ class ProductService{
     async findUpdate(filter,update,option){
         return await this.dao.findAndUpdate(filter,update,option)
     }
-    async getPaginate(){
-        return await this.dao.getWithPaginate()
+    async getPaginate(query,option,callback){
+        return await this.dao.getWithPaginate(query,option,callback)
     }
 
     async deletedProduct(filter){

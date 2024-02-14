@@ -126,7 +126,6 @@ export class CartController {
         try {
 
             archivoPM = await productService.getOneProduct({ status: true, _id: pid })
-            // archivoPM = await productosModelo.findOne({ status: true, _id: pid })
         } catch (error) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(500).json({ error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, detalle: error.message })

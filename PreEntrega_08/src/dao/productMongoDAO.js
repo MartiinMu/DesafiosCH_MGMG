@@ -16,8 +16,8 @@ export class productDAO {
         return productosModelo.findOne(filter).populate(populate)
     }
 
-    async getWithPaginate(){
-        return productosModelo.paginate()
+    async getWithPaginate(query,option,callback){
+        return productosModelo.paginate(query,option,callback)
     }
 
     
