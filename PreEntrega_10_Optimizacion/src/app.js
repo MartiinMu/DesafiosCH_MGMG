@@ -22,6 +22,7 @@ import {router as routerCarts} from './routes/carts.routerMONGO.js'
 import { router as routerRealTimeProducts } from './routes/realTimeProducts.router.js';
 import { router as routerMessages } from './routes/messages.router.js';
 import { router as sessionRouter } from './routes/session.router.js';
+import { errorHandler } from './Middleware/ErrorHandler.js';
 
 
 
@@ -82,7 +83,7 @@ const server = app.listen(config.PORT, () => {
 
 export const io=new Server(server)
 
-
+app.use(errorHandler)
 
 
 

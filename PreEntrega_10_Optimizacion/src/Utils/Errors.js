@@ -1,42 +1,41 @@
-export class CustomError extends Error{ // ---> Error es un clase que Nativa de JS. Aca hacemos una extencion de esa clase
-    constructor(nombre, mensaje, codigo=500, descrip=""){
-        super(mensaje) // ---> Si la xlase padre ya tiene un constructor, en la extencion se pone super que hace referencia al CONTROLADOR de la clase padre. El controlador del error es el mensaje.
-        this.name=nombre
-        this.codigo=codigo
-        this.descrip=descrip
-    }
+import os from 'os' 
+
+
+
+export const errorArgumentos=({datos})=>{ 
+
+    return ` Error en argumentos: Argumentos Recibidos:  - Los argumentos recibidos son ${datos} .Argumentos Obligatorios son:  - title, description, code, price, status, stock, category, thumbnails `
+
 }
 
-export const TIPOS_ERROR={
-    ARGUMENTOS:400,
-    VALIDACION:400, 
-    DB:500,
-    AUTENTICACION:401,
-    AUTORIZACION:403,
-    SERVER:500,
-    INDETERMINADO:500
+export const errorIdMongoose=({datos})=>{ 
+
+    return ` Error en ID: Id Recibido:  - ${datos} . Argumentos Obligatorios son:  Id Tipo mongoose`
+
 }
 
-export const error1=()=>{
-    throw new CustomError("error1", "error fn sync anidada", TIPOS_ERROR.ARGUMENTOS, "error descrip")
-} 
 
-export const error2=async()=>{
-    try {
-        throw new CustomError("error2", "error fn async anidada", TIPOS_ERROR.ARGUMENTOS, "error descrip")
-    } catch (error) {
-        throw new CustomError(error.name?error.name:"error generico", error.message, error.codigo?error.codigo:TIPOS_ERROR.INDETERMINADO, error.descrip?error.descrip:"Error indeterminado...")
-    }
-} 
+export const errorIdNoEnBD=({datos})=>{ 
 
-export const error3=async()=>{
-    try {
-        console.log(blablabla)
-    } catch (error) {
-        throw new CustomError(error.name?error.name:"error generico", error.message, error.codigo?error.codigo:TIPOS_ERROR.INDETERMINADO, error.descrip?error.descrip:"Error indeterminado...")
-    }
-} 
+    return ` Error en ID: Id Recibido:  - ${datos} . El ID no se encuentra en la base de datos.`
 
-export const error4=async()=>{
-    throw new CustomError("Error validacion...", "Error validacion mensaje...", TIPOS_ERROR.ARGUMENTOS, "descrip error validacion")
+}
+
+export const errorUpdateIDyCODE=({datos})=>{ 
+
+    return ` Error en Update: Datos Recibidos:  - ${datos} . No se pueden modificar la propiedades "_id" y "code"`
+
+}
+
+export const errorUpdate=({datos})=>{ 
+
+    return ` Error al modificar producto:  El contador de las modificaciones es:  - ${datos} . Deberia ser mayor o igual a 0`
+
+}
+
+
+export const errorCotejoKeys=({datos, llavesejemplo})=>{ 
+
+    return ` Ingresar propiedades:  Las propiedades ingresadas son: - ${datos} . Las permitidas son: ${llavesejemplo}`
+
 }

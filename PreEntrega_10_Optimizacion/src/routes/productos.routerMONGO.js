@@ -11,7 +11,7 @@ router.get('/', Acceso(["ADMIN"]),ProductsController.getProducts)
 router.get('/:pid',Acceso(["ADMIN"]), ProductsController.getProduct)
 
 
-router.post('/', ProductsController.postProduct)
+router.post('/',Acceso(["ADMIN"]), ProductsController.postProduct)
 
 
 router.put('/:pid',Acceso(["ADMIN"]), ProductsController.productUpdate)

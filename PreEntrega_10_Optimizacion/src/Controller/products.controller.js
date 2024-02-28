@@ -1,5 +1,8 @@
 import { productService } from "../Services/products.service.js";
-import { CustomError, TIPOS_ERROR, error1, error2 } from "../Utils/Errors.js";
+import { CustomError } from "../Utils/CustomErros.js";
+import { TIPOS_ERROR } from "../Utils/TypesErros.js";
+import { errorArgumentos, errorIdMongoose, errorIdNoEnBD, errorUpdate, errorUpdateIDyCODE } from "../Utils/Errors.js";
+import mongoose from "mongoose";
 import { io } from "../app.js";
 
 
@@ -29,36 +32,60 @@ export class ProductsController {
 
 
 
-    static async getProduct(req, res) {
+    static async getProduct(req, res, next) {
 
 
         let idParam = req.params.pid
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(idParam)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
         let archivoOne
         try {
             archivoOne = await productService.getOneProduct({ status: true, _id: idParam })
+
 
         } catch (error) {
             res.setHeader('Content-Type', 'application/json');
             return res.status(500).json({ error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, detalle: error.message })
 
+
+        }
+
+
+
+
+        try {
+
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
-
-
-
-
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${idParam} no existe` })
-
-
-            // throw CustomError.CustomError("Escoja id del Producto",`El id ${idParam} no existe`,STATUS_CODES.ERROR_DATOS_ENVIADOS, ERRORES_INTERNOS.DATOS_ENVIADO, Errores.errorId(archivoOne) )
-            // 
-
-
-
-        }
 
 
         res.setHeader('Content-Type', 'application/json');
@@ -69,7 +96,7 @@ export class ProductsController {
 
     static async postProduct(req, res, next) {
 
-        let body = req.body
+
 
         let { title, description, code, price, status, stock, category, thumbnails } = req.body
 
@@ -78,14 +105,14 @@ export class ProductsController {
         try {
 
             if (!title || !description || !code || !price || !status || !stock || !category) {
-                // res.setHeader('Content-Type', 'application/json');
-                // return res.status(400).json({ error: `Falta agregar un campo. Todos los campos son obligatorios. ` })
+
+                try {
+                    throw new CustomError("Ingresar propiedades del Producto", "Falta agregar un producto", TIPOS_ERROR.ARGUMENTOS, errorArgumentos(req.body))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
 
 
-                // throw new CustomError('Ingresar todos los argumentos','Falta ingreas 1 o mas argumentos', TIPOS_ERROR.ARGUMENTOS, "Error no se que")
-
-                // throw new CustomError("Error prueba", "Error /prueba", TIPOS_ERROR.ARGUMENTOS, "Error prueba, descrip...")
-               await error2()
 
             }
 
@@ -99,10 +126,22 @@ export class ProductsController {
 
         let existCode = await productService.getOneProduct({ status: true, code })
 
-        if (existCode) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El codigo: ${code} existente!` })
+
+        try {
+
+            if (existCode) {
+
+                try {
+                    throw new CustomError("Ingresar codigo", "Codigo repetido", TIPOS_ERROR.ARGUMENTOS, `El codigo: ${code} existente!`)
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
 
 
 
@@ -142,11 +181,30 @@ export class ProductsController {
 
 
 
-    static async productUpdate(req, res) {
+    static async productUpdate(req, res,next) {
 
 
 
         let idParam = req.params.pid
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(idParam)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
         let archivoOne
         try {
             archivoOne = await productService.getOneProduct({ status: true, _id: idParam })
@@ -157,45 +215,99 @@ export class ProductsController {
         }
 
 
-
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${idParam} no existe` })
-        }
-
-
-        if (req.body._id || req.body.code) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `No se pueden modificar la propiedades "_id" y "code"` })
-        }
-
-
-        let resultado
         try {
-            resultado = await productService.updateOneProduct({ status: true, _id: idParam }, req.body)
-            console.log(resultado)
-            if (resultado.modifiedCount > 0) {
 
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
 
-
-                res.setHeader('Content-Type', 'application/json');
-                return res.status(200).json({ payload: "Modificacion realizada" });
-            } else {
-                res.setHeader('Content-Type', 'application/json');
-                return res.status(400).json({ error: `No se concretó la modificación`, detalle: error.message })
             }
         } catch (error) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(500).json({ error: `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`, detalle: error.message })
-
+            return next(error)
         }
+
+
+
+
+
+
+        try {
+
+            if (req.body._id || req.body.code) {
+                try {
+                    throw new CustomError("No ingresar ID y CODE", `No se pueden modificar la propiedades "_id" y "code"`, TIPOS_ERROR.ARGUMENTOS, errorUpdateIDyCODE(req.body))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
+
+        let resultado = await productService.updateOneProduct({ status: true, _id: idParam }, req.body)
+            
+
+
+
+            try {
+
+                if (!resultado.modifiedCount > 0) {
+                    try {
+                        throw new CustomError("Modificacion", `No se concreto la modificacion`, TIPOS_ERROR.ARGUMENTOS, errorUpdate(resultado.modifiedCount))
+                    } catch (error) {
+                        throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                    }
+    
+                }
+            } catch (error) {
+                return next(error)
+            }
+
+
+            res.setHeader('Content-Type', 'application/json');
+            return res.status(200).json({ payload: "Modificacion realizada" });
+
+
+
+
+      
 
     }
 
 
-    static async deleteProduct(req, res) {
+    static async deleteProduct(req, res,next) {
 
         let idParam = req.params.pid
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(idParam)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
         let archivoOne
         try {
             archivoOne = await productService.getOneProduct({ status: true, _id: idParam })
@@ -207,9 +319,18 @@ export class ProductsController {
 
 
 
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${idParam} no existe` })
+        try {
+
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
@@ -228,11 +349,11 @@ export class ProductsController {
 
         let indiceProductos = Product.findIndex(prod => prod.code === codigoProd)
 
-        console.log('INDICE DE PRODUCTO:    ' + indiceProductos)
+        
 
         if (indiceProductos === -1) {
             res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `No existen usuarios con id ${idParam}` })
+            return res.status(400).json({ error: `No existen productos con id ${idParam}` })
         }
 
         io.emit("removeProduct", indiceProductos)

@@ -2,11 +2,15 @@ import { CartService } from "../Services/carts.service.js";
 import { productService } from "../Services/products.service.js";
 import { TicketService } from "../Services/tickets.service.js";
 import nodemailer from 'nodemailer'
+import mongoose from "mongoose";
 
 
 
 import { cartsModelo } from "../dao/models/carts.model.js";
 import { productosModelo } from "../dao/models/products.model.js";
+import { errorCotejoKeys, errorIdMongoose } from "../Utils/Errors.js";
+import { TIPOS_ERROR } from "../Utils/TypesErros.js";
+import { CustomError } from "../Utils/CustomErros.js";
 
 
 export class CartController {
@@ -63,7 +67,7 @@ export class CartController {
 
     }
 
-    static async getCartFilter(req, res) {
+    static async getCartFilter(req, res,next) {
 
 
 
@@ -74,6 +78,23 @@ export class CartController {
         let id = req.params.cid
 
 
+
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(id)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
 
 
 
@@ -89,10 +110,25 @@ export class CartController {
         }
 
 
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${id} no existe` })
+     
+        
+        try {
+
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idP))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
+
+
 
 
         res.setHeader('Content-Type', 'application/json');
@@ -104,6 +140,28 @@ export class CartController {
     static async getPurchase(req, res) {
 
         let id = req.params.cid
+
+
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(id)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
 
 
 
@@ -299,11 +357,33 @@ export class CartController {
 
     }
 
-    static async addProduct(req, res) {
+    static async addProduct(req, res, next) {
 
 
 
         let cid = req.params.cid
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(cid)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(cid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
+
 
         let archivo
         try {
@@ -317,10 +397,18 @@ export class CartController {
 
 
 
+        try {
 
-        if (!archivo) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${cid} no existe` })
+            if (!archivo) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(cid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
@@ -328,8 +416,35 @@ export class CartController {
 
 
 
+
+
+
         let pid = req.params.pid
-        
+
+        const esObjectIdValidoProduct = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValidoProduct(pid)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(pid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
+
+
+
+
+
 
 
         let archivoPM
@@ -344,11 +459,23 @@ export class CartController {
 
 
 
+        try {
 
-        if (!archivoPM) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${pid} no existe` })
+            if (!archivoPM) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(pid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
+
+
 
 
 
@@ -422,11 +549,33 @@ export class CartController {
     }
 
 
-    static async updateCart(req, res) {
+    static async updateCart(req, res,next) {
 
 
 
         let idParam = req.params.cid
+
+
+
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(idParam)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
 
 
         let archivoOne
@@ -441,9 +590,18 @@ export class CartController {
         }
 
 
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${idParam} no existe` })
+       try {
+
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
@@ -472,10 +630,29 @@ export class CartController {
 
         const cotejoArrays = llavesBody.every((llaves) => llavesEjemplos.includes(llaves))
 
-        if (!cotejoArrays) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `Alguna/as de las propiedas no son permitidas` })
+     
+
+        try {
+
+            if (!cotejoArrays) {
+                try {
+                    throw new CustomError("Ingresar propiedades", "Alguna/as de las propiedas no son permitidas", TIPOS_ERROR.ARGUMENTOS, errorCotejoKeys(llavesBody,llavesEjemplos))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
+
+
+
+
+
+
 
 
 
@@ -503,11 +680,33 @@ export class CartController {
 
 
 
-    static async updateCartProduct(req, res) {
+    static async updateCartProduct(req, res,next) {
 
 
 
         let idParam = req.params.cid
+
+
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(idParam)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
 
 
         let archivoOne
@@ -520,14 +719,46 @@ export class CartController {
         }
 
 
-        if (!archivoOne) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${idParam} no existe` })
+        try {
+
+            if (!archivoOne) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(idParam))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
 
         let pid = req.params.pid
+
+
+
+        const esObjectIdValidoProduct = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValidoProduct(pid)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(pid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
+
 
         let archivoPM
         try {
@@ -541,10 +772,30 @@ export class CartController {
 
 
 
-        if (!archivoPM) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${pid} no existe` })
+
+        try {
+
+            if (!archivoPM) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(pid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -556,10 +807,22 @@ export class CartController {
 
         const cotejoArrays = llavesBody.every((llaves) => llavesEjemplos.includes(llaves))
 
-        if (!cotejoArrays) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `Alguna/as de las propiedas no son permitidas` })
+
+        try {
+
+            if (!cotejoArrays) {
+                try {
+                    throw new CustomError("Ingresar propiedades", "Alguna/as de las propiedas no son permitidas", TIPOS_ERROR.ARGUMENTOS, errorCotejoKeys(llavesBody,llavesEjemplos))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
+
+
 
 
 
@@ -620,6 +883,25 @@ export class CartController {
 
 
         let id = req.params.cid
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(id)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
         let archivo
         try {
             archivo = await CartService.getOneCart({ _id: id })
@@ -632,9 +914,18 @@ export class CartController {
 
 
 
-        if (!archivo) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${id} no existe` })
+        try {
+
+            if (!archivo) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
@@ -658,9 +949,18 @@ export class CartController {
 
 
 
-        if (!archivoPM) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${pid} no existe` })
+        try {
+
+            if (!archivoPM) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(pid))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
@@ -705,6 +1005,33 @@ export class CartController {
 
 
         let id = req.params.cid
+
+        const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
+
+        try {
+            if (!esObjectIdValido(id)) {
+
+                try {
+                    throw new CustomError("Ingresar Id Mongoose", "No es Id Mongoose", TIPOS_ERROR.ARGUMENTOS, errorIdMongoose(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+            }
+        } catch (error) {
+            return next(error)
+        }
+
+
+
+
+
+
+
+
+
+
+
+
         let archivo
         try {
             archivo = await CartService.getOneCart({ _id: id })
@@ -717,9 +1044,18 @@ export class CartController {
 
 
 
-        if (!archivo) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `El id ${id} no existe` })
+        try {
+
+            if (!archivo) {
+                try {
+                    throw new CustomError("Ingresar ID", "ID no existe en la BD", TIPOS_ERROR.ARGUMENTOS, errorIdNoEnBD(id))
+                } catch (error) {
+                    throw new CustomError(error.name ? error.name : "error generico", error.message, error.codigo ? error.codigo : TIPOS_ERROR.INDETERMINADO, error.descrip ? error.descrip : `Error inesperado en el servidor - Intente más tarde, o contacte a su administrador`)
+                }
+
+            }
+        } catch (error) {
+            return next(error)
         }
 
 
