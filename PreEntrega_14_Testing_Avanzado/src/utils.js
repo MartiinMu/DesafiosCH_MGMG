@@ -76,6 +76,14 @@ export const Acceso=(permisos=[]) => {
   return (req,res,next) =>{
     permisos=permisos.map(p=>p.toLowerCase())
 
+
+    // let rolUser = req.cookies.coderCookie
+    // console.log(rolUser)
+    // rolUser=rolUser.split("=")[1]
+    // rolUser=verifyToken(rolUser)
+
+
+
             if(permisos.includes("public")){
                 return next()
             }

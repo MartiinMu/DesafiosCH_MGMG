@@ -203,7 +203,9 @@ export const inicializarPassport = () => {
 
                     return done(null, false)
                 }
-
+                
+                
+                let products = []
                 let usuario = await usuariosModelo.findOne({ email: profile._json.email })
                 let cart = await CartService.creatCart({ products })
                 cart = cart._id

@@ -20,4 +20,3 @@ router.put('/:pid',Acceso(["ADMIN"]), ProductsController.productUpdate)
 router.delete('/:pid',Acceso(["ADMIN","PREMIUM"]), ProductsController.deleteProduct)
 
 
-

@@ -8,6 +8,7 @@ import { CustomError } from "../Utils/CustomErros.js";
 import { TIPOS_ERROR } from "../Utils/TypesErros.js";
 import { UserService } from "../Services/users.service.js";
 import mongoose from "mongoose";
+import { UsuariosReadDTOesToen } from "../DTO/userDTO.js";
 
 
 export class ViewsController {
@@ -249,9 +250,16 @@ export class ViewsController {
 
 
 
-        let usuarioCookie = req.session.usuario
+        
+        let usuarioCookie = req.cookies.coderCookie
+        usuarioCookie=verifyToken(usuarioCookie)
+        usuarioCookie=usuarioCookie._doc
+        
 
-
+        if (usuarioCookie.nombre){
+            usuarioCookie= new UsuariosReadDTOesToen(usuarioCookie)
+        }
+        
 
         let { limit, page, category, precio } = req.query;
         const Filtro = req.query.filtro;

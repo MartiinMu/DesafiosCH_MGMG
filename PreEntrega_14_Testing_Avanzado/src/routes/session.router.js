@@ -19,19 +19,9 @@ router.get('/errorLogin', (req, res) => {
 
 router.post('/login', passport.authenticate('login', { failureRedirect: '/api/sessions/errorLogin' }), async (req, res) => {
 
-    req.session.usuario = {
-        nombre: req.user.first_name,
-        apellido: req.user.last_name,
-        email: req.user.email,
-        edad: req.user.age,
-        cart: req.user.cart,
-        rol: req.user.rol
-    }
-
-
+//    console.log(req.user)
 
     let token = generaToken(req.user)
-
     res.cookie("coderCookie", token, { httpOnly: true, maxAge: 1000 * 60 * 60 })
 
 
@@ -87,8 +77,14 @@ router.get('/github', passport.authenticate('github', {}), (req, res) => { })
 router.get('/callbackGithub', passport.authenticate('github', { failureRedirect: "/api/sessions/errorGithub" }), (req, res) => {
 
 
-    req.session.usuario = req.user
+    
 
+    let token=generaToken(req.user)
+    
+    let cookie = res.cookie("coderCookie", token, {httpOnly:true, maxAge: 1000*60*60})
+
+    
+   
 
     res.redirect('/products')
 
@@ -115,8 +111,13 @@ router.get('/errorCurrent', (req, res) => {
 
 router.get('/current', passport.authenticate('current', { session: false, failureRedirect: '/api/sessions/errorCurrent' }), (req, res) => {
 
-    let usuario = req.session.usuario
+    
+
+    let usuario = req.cookies.coderCookie
+    usuario = verifyToken(usuario)
     usuario = new UsuariosReadDTO(usuario)
+
+    
 
 
     res.setHeader('Content-Type', 'text/html')
@@ -139,21 +140,11 @@ router.post('/recuperarClave', async (req, res) => {
 
     let { contraseña1, contraseña2 } = req.body
 
-
-
-
-
-
     let { email } = req.body
     if (email) {
 
-
-
-
-        console.log(email)
-
         let usuario = await UserService.getOneUser({ email: email })
-        console.log(usuario + 'esto es el usuarioooo')
+        
 
         if (!usuario) {
             return res.redirect('/recuperarClave?error=Error: email no coincide')
@@ -187,7 +178,6 @@ router.post('/recuperarClave', async (req, res) => {
 
 
 
-
     let token = req.cookies.cookieToken
 
 
@@ -212,7 +202,7 @@ router.post('/recuperarClave', async (req, res) => {
         if (e.name === 'TokenExpiredError') {
             console.log('El token ha expirado.');
         } else {
-            console.log('Error al verificar el token:', error.message);
+            console.log('Error al verificar el token:', e.message);
         }
     }
 
@@ -222,11 +212,11 @@ router.post('/recuperarClave', async (req, res) => {
     }
 
 
-
+    
     datosToken = verifyToken(token)
-    datosToken = datosToken._doc
-
-
+    if(datosToken._doc){ datosToken = datosToken._doc }
+    
+        
     let usuario = await UserService.getOneUser({ email: datosToken.email })
 
     let passAnterior = validaPassword(usuario, contraseña1)
