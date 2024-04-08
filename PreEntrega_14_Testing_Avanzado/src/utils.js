@@ -77,8 +77,11 @@ export const Acceso=(permisos=[]) => {
     permisos=permisos.map(p=>p.toLowerCase())
 
 
-    // let rolUser = req.cookies.coderCookie
-    // console.log(rolUser)
+    let rolUser = req.cookies
+    
+    console.log("cookie de middleware")
+
+    console.log(rolUser)
     // rolUser=rolUser.split("=")[1]
     // rolUser=verifyToken(rolUser)
 

@@ -253,13 +253,14 @@ export class ViewsController {
         
         let usuarioCookie = req.cookies.coderCookie
         usuarioCookie=verifyToken(usuarioCookie)
-        usuarioCookie=usuarioCookie._doc
+        // console.log(usuarioCookie)
         
-
+        
         if (usuarioCookie.nombre){
-            usuarioCookie= new UsuariosReadDTOesToen(usuarioCookie)
-        }
-        
+                usuarioCookie= new UsuariosReadDTOesToen(usuarioCookie)
+            }
+            
+            usuarioCookie=usuarioCookie._doc
 
         let { limit, page, category, precio } = req.query;
         const Filtro = req.query.filtro;

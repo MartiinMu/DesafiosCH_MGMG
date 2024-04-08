@@ -221,6 +221,8 @@ describe("Prueba del proyecto ecommerce", async function () {
 
         it("Endpoint /api/products, metodo GET, obtiene productos solicitados", async () => {
 
+            let cookieToken 
+
             let usuario = { first_name: "nombreTest", last_name: "apellidoTest", age: 41, email: "testing@gmail.com", password: "123" }
 
 
@@ -232,6 +234,8 @@ describe("Prueba del proyecto ecommerce", async function () {
             let resultado2 = await requester.post("/api/sessions/login")
             .send(usuario2)
 
+            console.log(resultado2)
+
 
             const user = { username: 'usuario1', rol: 'ADMIN' }
         let resultado3 = await requester.get("/api/products")
@@ -242,7 +246,7 @@ describe("Prueba del proyecto ecommerce", async function () {
 
             
               
-              console.log(resultado3)
+            //   console.log(resultado3)
               
             //   console.log(cookie)
 
