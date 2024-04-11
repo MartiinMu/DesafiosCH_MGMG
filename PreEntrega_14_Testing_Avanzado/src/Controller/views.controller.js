@@ -250,17 +250,38 @@ export class ViewsController {
 
 
 
-        
+
         let usuarioCookie = req.cookies.coderCookie
-        usuarioCookie=verifyToken(usuarioCookie)
-        // console.log(usuarioCookie)
-        
-        
-        if (usuarioCookie.nombre){
-                usuarioCookie= new UsuariosReadDTOesToen(usuarioCookie)
+        usuarioCookie = verifyToken(usuarioCookie)
+
+
+        if (usuarioCookie.nombre) {
+            usuarioCookie = new UsuariosReadDTOesToen(usuarioCookie)
+        }
+        if (usuarioCookie._doc) {
+
+            usuarioCookie = usuarioCookie._doc
+        }
+
+
+
+        if (usuarioCookie.rol == "usuario" || usuarioCookie.rol == "premium") {
+
+            if (usuarioCookie.cart == undefined || usuarioCookie.cart == null) {
+
+                let products = []
+
+                let cart = await CartService.creatCart({ products })
+                cart = cart._id
+
+
+                let idCookie = usuarioCookie._id
+                await UserService.findUpdate({ _id: idCookie }, {$set: { cart}})
+
             }
-            
-            usuarioCookie=usuarioCookie._doc
+        }
+
+
 
         let { limit, page, category, precio } = req.query;
         const Filtro = req.query.filtro;
@@ -370,6 +391,7 @@ export class ViewsController {
 
         let { error } = req.query
 
+
         res.setHeader('Content-Type', 'text/html')
         res.status(200).render('registro', { error })
     }
@@ -456,7 +478,7 @@ export class ViewsController {
 
 
         let usuario = await UserService.getOneUser({ _id: uid })
-       
+
 
         if (usuario) {
 
@@ -464,7 +486,7 @@ export class ViewsController {
             let idUser = usuario._id
 
             res.setHeader('Content-Type', 'text/html')
-            res.status(200).render('changeRol', { usuario,emailUser , idUser})
+            res.status(200).render('changeRol', { usuario, emailUser, idUser })
 
 
             return

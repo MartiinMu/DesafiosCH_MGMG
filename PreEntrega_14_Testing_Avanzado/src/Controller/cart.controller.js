@@ -11,6 +11,7 @@ import { productosModelo } from "../dao/models/products.model.js";
 import { errorCotejoKeys, errorIdMongoose } from "../Utils/Errors.js";
 import { TIPOS_ERROR } from "../Utils/TypesErros.js";
 import { CustomError } from "../Utils/CustomErros.js";
+import { verifyToken } from "../utils.js";
  
 
 export class CartController {
@@ -22,20 +23,13 @@ export class CartController {
         let listaProductos = await CartService.getCart()
 
 
-        //Incrementar el id
-        let id = 1
-        if (listaProductos.length > 0) {
-            id = listaProductos[listaProductos.length - 1].id + 1
-        }
-
 
 
         let products = []
 
 
-
         try {
-            let nuevoProduct = await CartService.creatCart({ id, products })
+            let nuevoProduct = await CartService.creatCart({ products })
      
             res.setHeader('Content-Type', 'application/json');
             return res.status(200).json({ payload: nuevoProduct });
@@ -185,10 +179,9 @@ export class CartController {
 
         let qProd = carritos.products
 
-        let usuario = req.session.usuario
-
-
-
+        let usuario = req.cookies
+        usuario = verifyToken(usuario.coderCookie)
+ 
 
         let CartsConStock = []
         let CartsSinStock = []
@@ -340,8 +333,7 @@ export class CartController {
         enviar() 
 
 
-
-
+          
 
         const esSolicitudJSON = req.headers['content-type'] === 'application/json';
 
@@ -364,6 +356,7 @@ export class CartController {
 
 
         let cid = req.params.cid
+
 
 
         const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -487,18 +480,25 @@ export class CartController {
         let ownerRol = userCookieToken.rol.toUpperCase()
         let ownerEmail = userCookieToken.email.toUpperCase()
 
+        
+        let ownerArchivoPM
 
-        let ownerArchivoPM = archivoPM.owner.toUpperCase()
-
-        if( ownerRol === "PREMIUM" && ownerArchivoPM == ownerEmail) {
-            res.setHeader('Content-Type', 'application/json');
-            return res.status(400).json({ error: `No puede agregar productos siendo el owner del producto igual al suyo` })
-                 
+        if(archivoPM.owner){
+            
+            ownerArchivoPM = archivoPM.owner.toUpperCase()
+            
+            if( ownerRol === "PREMIUM" && ownerArchivoPM == ownerEmail) {
+                res.setHeader('Content-Type', 'application/json');
+                return res.status(400).json({ error: `No puede agregar productos siendo el owner del producto igual al suyo` })
+                
+            }
         }
+        
 
 
+        let productAdded
 
-
+        
         if (archivoPM) {
 
             archivo = await CartService.getOneCart({ _id: cid })
@@ -508,13 +508,13 @@ export class CartController {
             let prodFind = await CartService.getOneCart({ _id: cid })
             
             prodFind = prodFind.products.find(product => product.product.toString() === pid)
-
+            
             let findQuantity
             if (prodFind == undefined) {
                 let product = pid
                 let quantity = 1
                 let CreateProduct = await CartService.updateOneCart({ _id: cid }, { $push: { products: { product, quantity } } })
-
+                
 
 
             } else {
@@ -528,7 +528,7 @@ export class CartController {
 
 
 
-                await CartService.updateOneCart(
+               productAdded =  await CartService.updateOneCart(
                     {
                         _id: cid
                     },
@@ -543,21 +543,22 @@ export class CartController {
 
 
                 
+                    
+                }
+                
+                
+                let CarritoActualizado
+                
+                if (prodFind == null) {
+                    CarritoActualizado = `Se Creo los campos product y quantity. Product = ${pid} y Quantity = 1`
+                } else {
+                    CarritoActualizado = await CartService.getOneCart({ _id: cid })
+                }
 
-            }
-
-
-            let CarritoActualizado
-
-            if (prodFind == null) {
-                CarritoActualizado = `Se Creo los campos product y quantity. Product = ${pid} y Quantity = 1`
-            } else {
-                CarritoActualizado = await CartService.getOneCart({ _id: cid })
-            }
-
+                           
 
             res.setHeader('Content-Type', 'application/json');
-            return res.status(201).json({ CarritoActualizado });
+            return res.status(201).json({ CarritoActualizado,productAdded });
 
 
         }
@@ -572,7 +573,6 @@ export class CartController {
 
 
         let idParam = req.params.cid
-
 
 
 
@@ -686,6 +686,7 @@ export class CartController {
 
         )
 
+     let updateCart =  await CartService.getOneCart({_id : idParam})
 
         const esSolicitudJSON = req.headers['content-type'] === 'application/json';
 
@@ -693,7 +694,7 @@ export class CartController {
 
 
             res.status(200).json({
-                ProductoEliminado
+                ProductoEliminado,updateCart
             })
         }
     }
@@ -705,7 +706,6 @@ export class CartController {
 
 
         let idParam = req.params.cid
-
 
 
         const esObjectIdValido = (id) => mongoose.Types.ObjectId.isValid(id);
@@ -880,17 +880,14 @@ export class CartController {
 
 
 
-        let ProductoActualizado = await CartService.getPaginate({ _id: idParam })
-
-
-
+        let updateCart =  await CartService.getOneCart({_id : idParam})
         const esSolicitudJSON = req.headers['content-type'] === 'application/json';
 
         if (esSolicitudJSON) {
 
 
             res.status(200).json({
-                ProductoOriginal: ProductoOriginal.docs, ProductoActualizado: ProductoActualizado.docs
+                ProductoOriginal: ProductoOriginal.docs, updateCart
             })
         }
 
@@ -1019,9 +1016,11 @@ export class CartController {
                 );
             }
 
+            let productsDelete = await CartService.getOneCart({ _id: id })
+
 
             res.setHeader('Content-Type', 'application/json');
-            return res.status(201).json({ ProductoEliminado });
+            return res.status(201).json({ ProductoEliminado ,productsDelete});
 
         }
     }
@@ -1050,17 +1049,7 @@ export class CartController {
         }
 
 
-
-
-
-
-
-
-
-
-
-
-        let archivo
+       let archivo
         try {
             archivo = await CartService.getOneCart({ _id: id })
 
@@ -1088,19 +1077,20 @@ export class CartController {
         }
 
 
+        
 
-        let ProductoEliminado = await CartController.findUpdate(
+        let ProductoEliminado = await CartService.findUpdate(
             { _id: id },
             { $set: { products: [] } },
         );
-
-
+        
+        
+        let UpdateProduct = await CartService.getOneCart({ _id: id })
 
         res.setHeader('Content-Type', 'application/json');
-        return res.status(201).json({ ProductoEliminado });
+        return res.status(201).json({ UpdateProduct,ProductoEliminado });
 
     }
-
 
 
 }

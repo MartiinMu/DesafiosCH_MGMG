@@ -72,36 +72,67 @@ export const auth = (req, res, next) => {
 
 
 
-export const Acceso=(permisos=[]) => {
-  return (req,res,next) =>{
-    permisos=permisos.map(p=>p.toLowerCase())
+export const Acceso = (permisos = []) => {
+  return (req, res, next) => {
+    permisos = permisos.map(p => p.toLowerCase())
 
 
     let rolUser = req.cookies
+ 
+
+    if(!req.cookies.coderCookie){
+      rolUser = {rol:"public"}
+    } else{
+      
+      rolUser = verifyToken(rolUser.coderCookie)
+      
+    }
+    rolUser.rol.toLowerCase()
     
-    console.log("cookie de middleware")
 
-    console.log(rolUser)
-    // rolUser=rolUser.split("=")[1]
-    // rolUser=verifyToken(rolUser)
+     if (permisos.includes("public")) {
+      return next()
+    }
 
+    if (!rolUser || !rolUser.rol) {
+      return res.status(403).json({ message: "No hay usuarios logueados" })
+    }
 
+    if (!permisos.includes(rolUser.rol)) {
+      return res.status(403).json({ message: "No tiene privilegios suficientes para acceder a este recurso." })
+    }
 
-            if(permisos.includes("public")){
-                return next()
-            }
-
-           if(!req.user || !req.user.rol){
-                return res.status(403).json({ message: "No hay usuarios logueados" }) 
-            }
-
-            if(!permisos.includes(req.user.rol.toLowerCase())){ 
-                return res.status(403).json({ message:"No tiene privilegios suficientes para acceder a este recurso."})
-            }
-
-            return next()
+    return next()
   }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
