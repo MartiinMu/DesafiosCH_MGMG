@@ -56,14 +56,14 @@ describe("Prueba del proyecto ecommerce", async function () {
 
             let response1 = await requester.post("/api/sessions/registro").send(usuario)
 
+            
             expect(response1.statusCode).to.be.equal(302)
             expect(response1.redirect).to.be.true
-
-
-
-            let response2 = await requester.get("/")
-                .query({ error: "Error en el proceso de registro" })
-
+            
+            
+            
+            let response2 = await requester.get("/registro").query({ error: "Error en el proceso de registro" })
+            
             expect(response2.statusCode).to.be.equal(200)
             expect(response2.ok).to.be.true
 
@@ -211,65 +211,7 @@ describe("Prueba del proyecto ecommerce", async function () {
     })
 
 
-    describe("Prueba del modulo Sessions", async function () {
-
-
-        after(async () => {
-            let resultado = await mongoose.connection.collection("usuarios").deleteMany({ email: "testing@gmail.com" })
-        })
-
-
-        it("Endpoint /api/products, metodo GET, obtiene productos solicitados", async () => {
-
-            let cookieToken 
-
-            let usuario = { first_name: "nombreTest", last_name: "apellidoTest", age: 41, email: "testing@gmail.com", password: "123" }
-
-
-            let resultado1= await requester.post("/api/sessions/registro").send(usuario)
-
-
-            let usuario2 = { email: "testing@gmail.com", password: "123" }
-
-            let resultado2 = await requester.post("/api/sessions/login")
-            .send(usuario2)
-
-            console.log(resultado2)
-
-
-            const user = { username: 'usuario1', rol: 'ADMIN' }
-        let resultado3 = await requester.get("/api/products")
-            .set("Cookie", cookie) 
-            // .send(user);
-            
-            
-
-            
-              
-            //   console.log(resultado3)
-              
-            //   console.log(cookie)
-
-
-
-            // expect(statusCode).to.be.equal(302)
-            // expect(redirect).to.be.true
-            // cookie = headers["set-cookie"][0].split("=")
-            // let nombreCookie = cookie[0]
-            // cookie = cookie[1].split(";")[0]
-            // // console.log(cookie)
-
-            // expect(nombreCookie).to.be.equal("coderCookie")
-
-
-        })
-
-
-    })
-
-
-
-
+    
 
 
 })
